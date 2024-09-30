@@ -1,10 +1,11 @@
-from typing import Dict, List
+from typing import List
+
 from subject import Subject
 
 
 class Heap:
     def __init__(self):
-        self.subjects: List[Subject] = [None]  # We will not be using index 1
+        self.subjects: List[Subject] = [None]  # We will not be using index 0
         self.key_to_index: Dict[int, int] = {}
 
     def put(self, entry: Subject):
@@ -23,13 +24,16 @@ class Heap:
         if self.key_to_index.get(key) is None:
             return
         index = self.key_to_index[key]
-        del self.subjects[index]
-        last_entry = self.subjects.pop()
-        if index < len(self.subjects):
+
+        if index == len(self.subjects) - 1:
+            self.subjects.pop()
+        else:
+            last_entry = self.subjects.pop()
             self.subjects[index] = last_entry
             self.key_to_index[last_entry.key] = index
             self._sift_up(index)
             self._sift_down(index)
+
         del self.key_to_index[key]
 
     def get(self, key: int):
@@ -43,8 +47,8 @@ class Heap:
         return None
 
     def initialize(self, entries: List[Subject]):
-        self.subjects = [None]
-        self.key_to_index = {}
+        self.subjects = [None] + entries
+        self.key_to_index = {entry.key: i + 1 for i, entry in enumerate(entries)}
         for i in range(len(self.subjects) // 2, 0, -1):
             self._sift_down(i)
 
